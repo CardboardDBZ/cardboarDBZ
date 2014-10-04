@@ -1,2 +1,3 @@
 *.~
 *.pyc
+PrimeSense/data/gestures/*

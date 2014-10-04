@@ -10,6 +10,8 @@ import numpy as np
 import scipy as sp
 import pandas as pd
 import zmq
+import hashlib
+import time
 
 from StoppableThread import StoppableThread
 from DeviceReceiver import DeviceReceiver
@@ -37,7 +39,7 @@ class PrimeSense():
 			p.skeleton_poses_h: list of dfs reprsenting poses in h_coords
 	"""
 
-	def __init__(self, video=None):
+	def __init__(self, video=None, record=False):
 
 		#=====[ Step 1: setup receiving data	]=====
 		if video:
@@ -52,7 +54,8 @@ class PrimeSense():
 		self.communication_host = CommunicationHost()
 
 		#=====[ Step 3: try to inialize the game	]=====
-		self.init_game ()
+		if not record:
+			self.init_game ()
 
 
 
@@ -199,6 +202,42 @@ class PrimeSense():
 		save_name = raw_input('--> ')
 		pickle.dump(raw_frames, open(os.path.join('./data', 'save_name'), 'w'))
 		return raw_frames
+
+
+	def record_gesture(self):
+
+		print '===[ Record Gesture ]==='
+		print "Enter gesture name"
+		gesture_name = raw_input('--->')
+		
+		#=====[ Step 1: make a gesture directory	]=====
+		gestures_dir = os.path.join(os.getcwd(), 'data/gestures')
+		gesture_dir = os.path.join(gestures_dir, gesture_name)
+		if not os.path.exists(gesture_dir):
+			os.mkdir(gesture_dir)
+
+		#=====[ Step 2: record each gesture	]=====
+		player = None
+		while True:
+			try:
+				raw_input('>> press enter to record a gesture <<')
+				self.update_skeletons()
+				if self.num_skeletons != 1:
+					print "==> ERROR: multiple people on premises"
+					continue 
+				if not player:
+					player = Player(0, self.skeleton_poses_c[0])
+				else:
+					print self.skeleton_poses_c[0]
+					player.update(self.skeleton_poses_c)
+
+				h_coords = player.h_coords
+				filename = hashlib.md5(str(time.time())).hexdigest() + '.pose'
+				pickle.dump(h_coords, open(os.path.join(gesture_dir, filename), 'w'))
+				print "[[ SAVED: %s ]]" % os.path.join(gesture_dir, filename)
+			except KeyboardInterrupt:
+				break
+
 
 
 
