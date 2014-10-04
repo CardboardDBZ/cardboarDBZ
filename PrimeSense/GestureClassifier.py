@@ -7,6 +7,8 @@ from sklearn import cross_validation
 from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import confusion_matrix
+import matplotlib.pyplot as plt
 
 class GestureClassifier:
 
@@ -73,11 +75,10 @@ class GestureClassifier:
 		"""
 			evaluates the model 
 		"""
-		#=====[ Step 1: split test/train	]=====
+		#=====[ Step 1: Get X, y	]=====
 		X, y = self.get_X_y()
-		X_train, X_test, y_train, y_test = cross_validation.train_test_split(X, y, test_size=0.4, random_state=0)
 
-		#=====[ Step 2: setup models 	]=====
+		#=====[ Step 2: Cross Validation	]=====
 		clf_svm = SVC(kernel='linear', C=1)
 		clf_log = LogisticRegression()
 		clf_knn = KNeighborsClassifier(n_neighbors=5)
@@ -88,10 +89,24 @@ class GestureClassifier:
 		print 'LOG: ', scores_log
 		print 'KNN: ', scores_knn
 
+		#=====[ Step 3: check out confusion matrix	]=====
+		X_train, X_test, y_train, y_test = cross_validation.train_test_split(X, y, test_size=0.4, random_state=0)
+		y_pred = clf_log.fit(X_train, y_train).predict(X_test)
+		cm = confusion_matrix(y_test, y_pred)
+		plt.matshow(cm)
+		plt.title('Confusion matrix')
+		plt.colorbar()
+		plt.ylabel('True label')
+		plt.xlabel('Predicted label')
+		plt.show()
+
+
+
 
 
 if __name__ == '__main__':
 
 	classifier = GestureClassifier()
+	classifier.evaluate_models()
 
 
