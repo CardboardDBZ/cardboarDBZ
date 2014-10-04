@@ -97,15 +97,37 @@ class PrimeSense():
 
 		"""
 		assert type(c_coords) == pd.DataFrame
+
+		#=====[ Get axes (normalized) and origin	]=====
 		origin = (c_coords.left_shoulder + c_coords.right_shoulder)/2.
 		x_axis = c_coords.right_shoulder - origin
 		z_axis = origin - c_coords.torso
 		y_axis = pd.DataFrame(np.cross(z_axis, x_axis), columns=['x','y','z'])
+		x_axis = x_axis.divide(x_axis.sum(axis=1), axis=0)
+		y_axis = y_axis.divide(y_axis.sum(axis=1), axis=0)
+		z_axis = z_axis.divide(z_axis.sum(axis=1), axis=0)
 
-		#=====[ d = difference of points from origin	]=====
+		#=====[ get d = difference of points from origin	]=====
 		differences = [c_coords[label] - origin for label in c_coords.columns.levels[0]]
 		d = pd.concat(differences, keys=c_coords.columns.levels[0], axis=1)
-		return origin, x_axis, y_axis, z_axis, d
+
+		#=====[ rephrase d using the basis x_axis, y_axis, z_axis	]=====
+		H = []
+		for ix, row in c_coords.iterrows():
+			M = np.eye(3)
+			M[:, 0] = np.array(x_axis.iloc[ix])
+			M[:, 1] = np.array(y_axis.iloc[ix])
+			M[:, 2] = np.array(z_axis.iloc[ix])
+			# M*[a, b, c] = d
+			# ==> pinv(M)*d = [a, b, c]
+			h_coords = [np.dot(np.linalg.pinv(M), np.array(d.iloc[ix][label])) for label in c_coords.columns.levels[0]]
+			h_coords = [pd.DataFrame([h], columns=['x','y','z']) for h in h_coords]
+			h_coords = pd.concat(h_coords, keys=c_coords.columns.levels[0], axis=1)
+			H.append(h_coords)
+		H = pd.concat(H)
+
+		return origin, x_axis, y_axis, z_axis, H
+
 
 		
 
