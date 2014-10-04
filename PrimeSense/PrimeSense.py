@@ -97,8 +97,18 @@ class PrimeSense():
 
 		"""
 		assert type(c_coords) == pd.DataFrame
-		h_origin_c_coords = (df.left_shoulder + df.right_shoulder)/2
-		x_dir_c_coords = df.right_shoulder - h_origin_c_coords 
+		origin = (c_coords.left_shoulder + c_coords.right_shoulder)/2.
+		x_axis = c_coords.right_shoulder - origin
+		z_axis = origin - c_coords.torso
+		y_axis = pd.DataFrame(np.cross(z_axis, x_axis), columns=['x','y','z'])
+
+		#=====[ d = difference of points from origin	]=====
+		differences = [c_coords[label] - origin for label in c_coords.columns.levels[0]]
+		d = pd.concat(differences, keys=c_coords.columns.levels[0], axis=1)
+		return origin, x_axis, y_axis, z_axis, d
+
+		
+
 
 
 
