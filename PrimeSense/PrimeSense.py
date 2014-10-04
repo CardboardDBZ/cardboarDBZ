@@ -164,7 +164,7 @@ class PrimeSense():
 			prints out what is going on in the game currently
 		"""
 		print '##################################################'
-		print '##########[ FRAME STATS ]#########################'
+		print '##########[ FRAME STATS: #%d ]####################' % self.video_frame
 		print '##################################################'				
 		print '# skeletons in frame: %d' % self.num_skeletons
 
