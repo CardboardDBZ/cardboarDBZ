@@ -101,12 +101,16 @@ class DeviceReceiver (StoppableThread):
             given a frame from PrimesenseReceiver, this will format it so that it 
             can go into a pandas dataframe easily
         """
+
         formatted_frame = {}
-        for joint_name, data in frame.iteritems ():
-            position = self.format_coords(data['REAL_WORLD_POSITION'])
-            orientation = self.format_coords (data['ORIENTATION'])
-            formatted_frame [joint_name + "_POSITION"] = position
-            formatted_frame [joint_name + "_ORIENTATION"] = orientation
+        for user, user_frame in frame.iteritems():
+            formatted_frame[user] = {}
+            for joint_name, data in user_frame.iteritems ():
+                position = self.format_coords(data['REAL_WORLD_POSITION'])
+                orientation = self.format_coords (data['ORIENTATION'])
+                formatted_frame[user][joint_name + "_POSITION"] = position
+                formatted_frame[user][joint_name + "_ORIENTATION"] = orientation
+
         return formatted_frame
 
 

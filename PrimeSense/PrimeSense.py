@@ -27,6 +27,9 @@ class PrimeSense():
 
 			primesense = PrimeSense()
 			primesense.send_frames()
+
+			p.skeleton_poses: list of dfs representing poses in c_coords 
+			p.skeleton_poses_h: list of dfs reprsenting poses in h_coords
 	"""
 
 	def __init__(self):
@@ -56,13 +59,48 @@ class PrimeSense():
 		self.pos_df = pd.concat(dfs, keys=self.joint_frames.keys(), axis=1)
 
 
-	def update(self):
-		frame = self.receiver.get_frame()
-		for raw_key in frame.keys():
-			if raw_key.endswith('POSITION'):
-				key = self.key_conversion(raw_key)
-				self.joint_frames[key].append(frame[raw_key])
-		self.get_pos_df()
+	def dict_to_df(self, d):
+		"""
+			performs the following conversion:
+				{	
+					joint_name:{'x':..., 'y':..., 'z':...},
+					..
+				}
+				==>
+				df indexed by joint_name -> coordinate 
+		"""
+
+		return pd.DataFrame(d)
+
+
+	def update(self, input_frame=None):
+		"""
+			- updates frame_processed (primesense coordinates)
+		"""
+		#=====[ Step 1: raw frame and metadata	]=====
+		if input_frame:
+			self.frame_raw = input_frame
+		else:
+			self.frame_raw = self.receiver.get_frame()
+		self.num_skeletons = len(self.frame_raw.keys())
+
+		#=====[ Step 2: process the frame	]=====
+		self.frame_processed = {}
+		for s_name, s_frame in self.frame_raw.iteritems():
+			self.frame_processed[s_name] = {}
+			for raw_key in s_frame.keys():
+				if raw_key.endswith('POSITION'):
+					key = self.key_conversion(raw_key)
+					self.frame_processed[s_name][key] = s_frame[raw_key]
+
+		#=====[ Step 3: get skeleton_poses	]=====
+		self.skeleton_poses_c = []
+		for s_name, s_frame in self.frame_processed.items():
+			self.skeleton_poses_c.append(self.dict_to_df(s_frame))
+
+		#=====[ Step 4: get skeleton_poses_h	]=====
+		self.skeleton_poses_h = [self.to_human_coords(c_coords) for c_coords in self.skeleton_poses_c]
+
 
 
 	def record(self):
@@ -86,23 +124,21 @@ class PrimeSense():
 
 
 
-	def get_origin_axes(self, camera_coords):
+	def get_origin_axes(self, c_coords):
 		"""
 			given a body represented in camera coordinates,
 			returns its origin,x,y,z_axes
 
-			camera_coords: dataframe containing body coordinates 
-				over time 
+			c_coords: pd.DataFrame containing camera coordinates
+			returns: numpy arrays for origin, x/y/z axes
 		"""
-		assert type(camera_coords) == pd.DataFrame
-		c_coords = camera_coords
-		origin = (c_coords.left_shoulder + c_coords.right_shoulder)/2.
-		x_axis = c_coords.right_shoulder - origin
-		z_axis = origin - c_coords.torso
-		y_axis = pd.DataFrame(np.cross(z_axis, x_axis), columns=['x','y','z'])
-		x_axis = x_axis.divide(x_axis.sum(axis=1), axis=0)
-		y_axis = y_axis.divide(y_axis.sum(axis=1), axis=0)
-		z_axis = z_axis.divide(z_axis.sum(axis=1), axis=0)
+		origin = np.array((c_coords['left_shoulder'] + c_coords['right_shoulder'])/2.)
+		x_axis = np.array(c_coords['right_shoulder'] - origin)
+		z_axis = np.array(origin - c_coords['torso'])
+		y_axis =np.cross(z_axis, x_axis)
+		x_axis = x_axis / x_axis.sum()
+		y_axis = y_axis / y_axis.sum()
+		z_axis = z_axis / z_axis.sum()
 		return origin, x_axis, y_axis, z_axis
 
 
@@ -111,26 +147,21 @@ class PrimeSense():
 			converts original_coords to the coordinate system 
 			represented by origin, x_axis, y_axis, z_axis. each of those 
 			are in the original cooords.
+
 		"""
 		#=====[ Step 1: get differences	]=====
 		differences = original_coords.copy()
-		for label in original_coords.columns.levels[0]:
+		for label in original_coords.columns:
 			differences[label] = differences[label] - origin
 
 		#=====[ Step 2: transform each one	]=====
-		new_coords = []
-		for ix, row in original_coords.iterrows():
-			M = np.eye(3)
-			M[:, 0] = np.array(x_axis.iloc[ix])
-			M[:, 1] = np.array(y_axis.iloc[ix])
-			M[:, 2] = np.array(z_axis.iloc[ix])
-			# M*[a, b, c] = d
-			# ==> pinv(M)*d = [a, b, c]
-			h_coords = [np.dot(np.linalg.pinv(M), np.array(differences.iloc[ix][label])) for label in original_coords.columns.levels[0]]
-			h_coords = [pd.DataFrame([h], columns=['x','y','z']) for h in h_coords]
-			h_coords = pd.concat(h_coords, keys=original_coords.columns.levels[0], axis=1)
-			new_coords.append(h_coords)
-		new_coords = pd.concat(new_coords)
+		M = np.eye(3)
+		M[:, 0], M[:,1], M[:,2] = x_axis, y_axis, z_axis
+		# M*[a, b, c] = d
+		# ==> pinv(M)*d = [a, b, c]
+		new_coords = differences.copy()
+		for label in new_coords.columns:
+			new_coords[label] = np.dot(np.linalg.pinv(M), new_coords[label])
 		return new_coords
 
 
