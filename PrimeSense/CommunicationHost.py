@@ -9,10 +9,10 @@ import zmq
 class CommunicationHost:
 
 	def __init__(self):
-		self.context = zmq.context()
-		self.socket = context.socket(zmq.PUB)
-		socket.bind("tcp://*:5556")
+		self.context = zmq.Context()
+		self.socket = self.context.socket(zmq.PUB)
+		self.socket.bind("tcp://*:5556")
 
 	def send_frame(self, frame):
 		assert type(frame) == dict
-		socket.send(frame)
+		socket.send_json(frame)
