@@ -3,12 +3,14 @@
 # -----------------
 # wrapper class for dealing with the primesense
 ####################
+from collections import defaultdict
 import numpy as np
 import scipy as sp
 import pandas as pd
 import zmq
 from StoppableThread import StoppableThread
 from DeviceReceiver import DeviceReceiver
+from CommunicationHost import CommunicationHost
 
 def print_status(message):
 	print '---> %s' % message
@@ -31,11 +33,11 @@ class PrimeSense():
 
 		#=====[ Step 1: setup receiving data	]=====
 		self.receiver = DeviceReceiver('primesense')
+		self.communication_host = CommunicationHost()
 
 		#=====[ Step 2: set up coordinate lists	]=====
-		self.x_positions = []
-		self.y_positions = []
-		self.z_positions = []
+		self.joint_frames = defaultdict(list)
+
 
 
 	def key_conversion(self, key_name):
@@ -45,42 +47,44 @@ class PrimeSense():
 		return '_'.join(key_name.split('_')[1:-1]).lower()
 
 
+	def get_pos_df(self):
+		"""
+			sets self.pos_df from self.x_positions... etc
+
+		"""
+		dfs = [pd.DataFrame(x) for x in self.joint_frames.values()]
+		self.pos_df = pd.concat(dfs, keys=self.joint_frames.keys(), axis=1)
+
+
 	def update(self):
 		frame = self.receiver.get_frame()
-		x, y, z = {}, {}, {}
 		for raw_key in frame.keys():
 			if raw_key.endswith('POSITION'):
 				key = self.key_conversion(raw_key)
-				x[key] = frame[raw_key]['x']
-				y[key] = frame[raw_key]['y']
-				z[key] = frame[raw_key]['z']								
-		self.x_positions.append(x)
-		self.y_positions.append(y)
-		self.z_positions.append(z)
+				self.joint_frames[key].append(frame[raw_key])
+		self.get_pos_df()
 
 
-	def get_pose_df(self):
+	def person_exists(self):
 		"""
-			sets self.pose_df from self.x_positions... etc
+			returns true if there is a person onscreen in the last 
+			frame in self.pos_df
+			criterion: all *positions* are non-null
 		"""
-		#=====[ Step 1: make individual dfs	]=====
-		x_df = pd.DataFrame(self.x_positions)
-		y_df = pd.DataFrame(self.y_positions)
-		z_df = pd.DataFrame(self.z_positions)
-		assert len(x_df) == len(y_df)
-		assert len(z_df) == len(x_df)
-
-		#=====[ Step 2: join	]=====
-		self.pose_df = pd.concat([x_df, y_df, z_df], keys=['x','y','z'], axis=1)
+		return self.pos_df.iloc[-1].isnull().sum() == 0
 
 
-
-
-	def zmq_init(self):
+	def coordinate_transform(self, ps_coords):
 		"""
-			initializes zeromq for receiving/sending frames
+			given a position df, this will return 
+			it transformed
+
+			kinect_coords: df of coordinates from the primesense's 
+				perspective
 		"""
 		pass
+		# kinect_coords = self.pos_df
+		# person_origin = self.
 
 
 if __name__ == '__main__':
