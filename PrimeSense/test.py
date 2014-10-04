@@ -1,6 +1,5 @@
-from DeviceReceiver import DeviceReceiver
+from PrimeSense import PrimeSense
 
 if __name__ == '__main__':
 
-	primesense_receiver = DeviceReceiver('primesense')
-	frame = primesense_receiver.get_frame()
+	primesense = PrimeSense()
