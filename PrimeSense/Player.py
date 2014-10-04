@@ -117,8 +117,8 @@ class Player:
 		"""
 		other_player_h_coords = self.c_coords_to_h_coords(other_player_c_coords)
 		message = {
-					'self_coords':self.h_coords.to_json(),
-					'opponent_coords':other_player_h_coords.to_json()
+					'self_coords':self.h_coords.to_dict(),
+					'opponent_coords':other_player_h_coords.to_dict()
 		}
 		self.socket.send(message)
 
