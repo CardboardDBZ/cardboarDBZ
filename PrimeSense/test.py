@@ -1,5 +1,7 @@
+import pickle
 from PrimeSense import PrimeSense
 
 if __name__ == '__main__':
 
-	primesense = PrimeSense()
+	p = PrimeSense()
+	p.pos_df = pickle.load(open('data/sample_pos_df.pkl'))
