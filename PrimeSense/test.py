@@ -3,10 +3,9 @@ from PrimeSense import PrimeSense
 
 if __name__ == '__main__':
 
-	sample_frame = pickle.load(open('./data/raw_frame_sample.pkl','r'))
-	p = PrimeSense()
-	p.update(input_frame=sample_frame)
+	sample_video = pickle.load(open('./data/twoplayer_test_1.pkl','r'))
+	p = PrimeSense(sample_video)
+	for i in range(len(sample_video) - 2):
+		p.update_game()
 
-	s1_c = p.skeleton_poses_c[0]
-	s1_h = p.to_human_coords(s1_c)
 
