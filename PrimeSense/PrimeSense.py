@@ -65,6 +65,17 @@ class PrimeSense():
 		self.get_pos_df()
 
 
+	def record(self):
+		print "===[ Press Enter to Start ]==="
+		raw_input('--->')
+		while True:
+			try:
+				self.update()
+			except KeyboardInterrupt:
+				break
+		print '===[ Finished Recording ]==='
+
+
 	def person_exists(self):
 		"""
 			returns true if there is a person onscreen in the last 
@@ -74,17 +85,22 @@ class PrimeSense():
 		return self.pos_df.iloc[-1].isnull().sum() == 0
 
 
-	def coordinate_transform(self, ps_coords):
+	def coordinate_transform(self, c_coords):
 		"""
 			given a position df, this will return 
 			it transformed
 
 			kinect_coords: df of coordinates from the primesense's 
 				perspective
+
+			Uses convention: c = camera, h = human
+
 		"""
-		pass
-		# kinect_coords = self.pos_df
-		# person_origin = self.
+		assert type(c_coords) == pd.DataFrame
+		h_origin_c_coords = (df.left_shoulder + df.right_shoulder)/2
+		x_dir_c_coords = df.right_shoulder - h_origin_c_coords 
+
+
 
 
 if __name__ == '__main__':
