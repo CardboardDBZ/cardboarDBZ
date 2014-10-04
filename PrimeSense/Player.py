@@ -5,7 +5,7 @@
 ####################
 import numpy as np 
 import pandas as pd
-
+from UnitySocket import UnitySocket
 
 class Player:
 	"""
@@ -17,11 +17,12 @@ class Player:
 	DISTANCE_THRESHOLD = 5000
 
 
-	def __init__(self, initial_c_coords):
+	def __init__(self, index, initial_c_coords):
 		"""
 			intializes this player's coordinates
 		"""
 		self.update_coords(initial_c_coords)
+		self.socket = UnitySocket(index)
 
 
 	def get_origin(self, c_coords):
@@ -107,6 +108,19 @@ class Player:
 		else:
 			best_ix = np.argmin(distances)
 			self.update_coords(skeleton_c_coords.pop(best_ix)) #update with best
+
+
+	def send_state(self, other_player_c_coords):
+		"""
+			sends this Player's state from the primesense to the 
+			actual player via UnitySocket 
+		"""
+		other_player_h_coords = self.c_coords_to_h_coords(other_player_c_coords)
+		message = {
+					'self_coords':self.h_coords.to_json(),
+					'opponent_coords':other_player_h_coords.to_json()
+		}
+		self.socket.send(message)
 
 
 	def __str__ (self):

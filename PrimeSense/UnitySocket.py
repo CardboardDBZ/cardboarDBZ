@@ -5,7 +5,7 @@ class UnitySocket:
 
     def __init__(self, player=0):
         self.player = player
-        self.port = 5556 + player
+        self.port = 5557 + player
         self.s = socket.socket()
         self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.s.setblocking(0)
@@ -14,6 +14,7 @@ class UnitySocket:
         self.c = None
 
     def send(self, msg):
+        print msg, '\n\n\n'
         try:
             self.c, addr = self.s.accept()
         except socket.error:

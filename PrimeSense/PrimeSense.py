@@ -133,10 +133,8 @@ class PrimeSense():
 		head_coords = [c_coords['head']['x'] for c_coords in self.skeleton_poses_c]
 		leftmost_player_ix = np.argmin(head_coords) #we THINK this gets the leftmost
 		rightmost_player_ix = np.argmax(head_coords)
-		print leftmost_player_ix, rightmost_player_ix
-		print head_coords
-		self.players[0] = Player(self.skeleton_poses_c[leftmost_player_ix])
-		self.players[1] = Player(self.skeleton_poses_c[rightmost_player_ix])
+		self.players[0] = Player(0, self.skeleton_poses_c[leftmost_player_ix])
+		self.players[1] = Player(1, self.skeleton_poses_c[rightmost_player_ix])
 
 
 	def update_players(self):
@@ -149,6 +147,16 @@ class PrimeSense():
 			player.update(skeleton_c_coords)
 
 
+	def send_player_states(self):
+		"""	
+			sends the states of players from Player objects to 
+			the actual phones 
+		"""
+		if self.players[0] and self.players[1]:
+			self.players[0].send_state(self.players[1].c_coords)
+			self.players[1].send_state(self.players[0].c_coords)			
+
+
 	def update_game(self):
 		"""
 			updates all player locations in the game;
@@ -156,7 +164,7 @@ class PrimeSense():
 		self.update_skeletons()
 		self.update_players()
 		self.print_game_state()
-		# self.notify_players() #TODO
+		self.send_player_states()
 
 
 	def print_game_state(self):
