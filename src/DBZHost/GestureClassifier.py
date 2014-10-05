@@ -39,6 +39,7 @@ class GestureClassifier:
 		#=====[ Experiment: relative positions	]=====
 		gesture_df['hands_avg'] = (gesture_df['right_hand'] + gesture_df['left_hand'])/2.
 		gesture_df['elbows_avg'] = (gesture_df['right_elbow'] + gesture_df['left_elbow'])/2.
+		gesture_df['hands_diff'] = np.abs(gesture_df['right_hand'] - gesture_df['left_hand'])
 
 		return np.array(gesture_df).flatten()
 
@@ -109,8 +110,8 @@ class GestureClassifier:
 			trains classifier based on all data available
 		"""
 		self.load_data()
-		# self.classifier = KNeighborsClassifier(n_neighbors=2)
-		self.classifier = LogisticRegression()
+		self.classifier = KNeighborsClassifier(n_neighbors=2)
+		# self.classifier = LogisticRegression()
 		self.classifier.fit(self.X, self.y)
 		self.classifier_loaded = True
 
