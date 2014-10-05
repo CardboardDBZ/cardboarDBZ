@@ -17,6 +17,7 @@ from StoppableThread import StoppableThread
 from DeviceReceiver import DeviceReceiver
 from CommunicationHost import CommunicationHost
 from Player import Player
+from GestureClassifier import GestureClassifier
 
 
 def print_status(message):
@@ -58,6 +59,12 @@ class PrimeSense():
 			self.init_game ()
 
 
+
+
+
+	################################################################################
+	####################[ SKELETONS/DEVICES]########################################
+	################################################################################
 
 	def key_conversion(self, key_name):
 		"""
@@ -119,13 +126,23 @@ class PrimeSense():
 			self.skeleton_poses_c.append(self.dict_to_df(s_frame))
 
 
+
+
+
+
+
+	################################################################################
+	####################[ GAME AND PLAYERS ]########################################
+	################################################################################
+
 	def init_game(self):
 		"""
 			Tries to initialize the two players; won't do so 
 			until there are at least two players present
 		"""
 		self.game_started = False
-		self.players = [None, None]
+		self.gesture_classifier = GestureClassifier()
+		self.players = [Player(0, self.gesture_classifier), Player(1, self.gesture_classifier)]
 		self.update_skeletons()
 
 		#=====[ Step 1: loop until we see two players	]=====
@@ -168,6 +185,16 @@ class PrimeSense():
 		self.update_players()
 		self.print_game_state()
 		self.send_player_states()
+
+
+	def update_no_game(self):
+		"""
+			does updates but doesn't assume the game is going 
+			on 
+		"""
+		self.update_skeletons()
+		self.update_players()
+
 
 
 	def print_game_state(self):

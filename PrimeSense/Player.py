@@ -6,6 +6,7 @@
 import numpy as np 
 import pandas as pd
 from UnitySocket import UnitySocket
+from GestureClassifier import GestureClassifier
 
 class Player:
 	"""
@@ -17,12 +18,16 @@ class Player:
 	DISTANCE_THRESHOLD = 5000
 
 
-	def __init__(self, index, initial_c_coords):
+	def __init__(self, index, gesture_classifier):
 		"""
 			intializes this player's coordinates
 		"""
-		self.update_coords(initial_c_coords)
 		self.socket = UnitySocket(index)
+		self.index = index
+		self.gesture_classifier = gesture_classifier
+		self.c_coords = None
+		self.h_coords = None
+		self.gesture = 'no_gesture'
 
 
 	def get_origin(self, c_coords):
@@ -108,6 +113,16 @@ class Player:
 		else:
 			best_ix = np.argmin(distances)
 			self.update_coords(skeleton_c_coords.pop(best_ix)) #update with best
+			self.update_gesture()
+
+
+	def update_gesture(self):
+		"""
+			sets self.gesture to the prediction of self.gesture_classifier 
+		"""
+		if self.h_coords:
+			self.gesture = self.gesture_classifier.predict(self.h_coords)
+
 
 
 	def send_state(self, other_player_c_coords):
