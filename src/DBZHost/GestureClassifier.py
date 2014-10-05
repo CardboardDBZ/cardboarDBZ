@@ -14,6 +14,8 @@ import matplotlib.pyplot as plt
 
 class GestureClassifier:
 
+	GESTURE_CONFIDENCE_THRESHOLD = 0.9
+
 	def __init__(self, data_dir=os.path.join(os.getcwd(), 'data'), classifier_name='clf.pkl'):
 		self.data_dir = data_dir
 		self.gestures_dir = os.path.join(self.data_dir, 'gestures')
@@ -107,7 +109,8 @@ class GestureClassifier:
 			trains classifier based on all data available
 		"""
 		self.load_data()
-		self.classifier = KNeighborsClassifier(n_neighbors=2)
+		# self.classifier = KNeighborsClassifier(n_neighbors=2)
+		self.classifier = LogisticRegression()
 		self.classifier.fit(self.X, self.y)
 		self.classifier_loaded = True
 
@@ -117,7 +120,11 @@ class GestureClassifier:
 			returns a prediction based on the pose 
 		"""
 		assert self.classifier_loaded
-		return self.classifier.predict(self.featurize(gesture_df))
+		prob_predicitons = self.classifier.predict_proba(self.featurize(gesture_df))
+		if not np.max(prob_predicitons) > self.GESTURE_CONFIDENCE_THRESHOLD:
+			return ['no_gesture']
+		else:
+			return self.classifier.predict(self.featurize(gesture_df))
 
 
 	def save(self):
