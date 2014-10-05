@@ -9,6 +9,7 @@ class StoppableThread (threading.Thread):
 
 	def __init__ (self, _name="<UNKNOWN_THREAD>"):
 		threading.Thread.__init__(self)
+		self.daemon = True
 
 		self._name = _name
 		self._stop = threading.Event ()
@@ -22,6 +23,7 @@ class StoppableThread (threading.Thread):
 		"""
 		while not self._stop.isSet ():
 			self.thread_iteration ()
+		print "stoppablethread.run()"
 
 
 	def stop (self):

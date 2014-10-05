@@ -46,6 +46,7 @@ class DBZController:
 			self.video = video			
 			self.video_mode = True
 			self.video_frame = -1
+			self.receiver = None
 		else:
 			self.receiver = DeviceReceiver('primesense')
 			self.video_mode = False
@@ -60,6 +61,9 @@ class DBZController:
 			self.init_game ()
 
 
+	def __del__(self):
+		if not self.receiver is None:
+			del self.receiver
 
 
 
@@ -84,7 +88,6 @@ class DBZController:
 				==>
 				df indexed by joint_name -> coordinate 
 		"""
-
 		return pd.DataFrame(d)
 
 
@@ -100,7 +103,9 @@ class DBZController:
 		#=====[ Step 1: deal with video mode	]=====
 		if not input_frame and self.video_mode:
 			self.video_frame += 1
-			raw_input('Video Mode [%s]: press enter to continue to next frame' % self.video_frame)
+			key = raw_input('Video Mode [%s]: press enter to continue to next frame, q to quit' % self.video_frame)
+			if key == 'q':
+				quit()
 			self.update_skeletons(input_frame=self.video[self.video_frame])
 			# self.print_game_state()
 			return

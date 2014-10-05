@@ -157,7 +157,7 @@ class Player:
 		"""
 		coords = coords.copy()
 		coords = coords / float(self.SCALING_CONSTANT)
-		coords.index = ['z', 'y', 'x']
+		# coords.index = ['z', 'y', 'x']
 		return coords.to_dict()
 
 
