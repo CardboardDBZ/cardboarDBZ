@@ -33,6 +33,7 @@ class Player:
 		self.h_coords = None
 		self.gesture = 'no_gesture'
 		self.gesture_history = []
+		self.state_history = []
 
 
 	def get_origin(self, c_coords):
@@ -174,6 +175,8 @@ class Player:
 			other_direction = other_player.direction.copy() / self.SCALING_CONSTANT
 			other_direction.index = ['z', 'y','x']
 			message['other_gesture_direction'] = other_direction.to_dict()
+		print message, '\n\n'
+		self.state_history.append(message)
 		self.socket.send(message)
 
 

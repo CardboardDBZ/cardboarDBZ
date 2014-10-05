@@ -1,6 +1,6 @@
 connect_parameters = {
 	'connect_address':"tcp://localhost:5555",
-	'none_substitutes':set(['1.17549435e-38', 1.17549435e-38])
+	'none_substitutes':set(['1.17549435e-38', 1.17549435e-38, 0.69, '0.69'])
 }
 device_filters = { 
 					'primesense':'__primesense__',

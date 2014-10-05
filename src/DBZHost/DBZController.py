@@ -191,7 +191,7 @@ class DBZController():
 		"""
 		self.update_skeletons()
 		self.update_players()
-		# self.print_game_state()
+		self.print_game_state()
 		self.send_player_states()
 
 

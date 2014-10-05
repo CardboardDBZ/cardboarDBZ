@@ -14,8 +14,6 @@ class UnitySocket:
         self.c = None
 
     def send(self, msg):
-        if self.player == 0:
-            print msg, '\n\n\n'
         try:
             self.c, addr = self.s.accept()
         except socket.error:
