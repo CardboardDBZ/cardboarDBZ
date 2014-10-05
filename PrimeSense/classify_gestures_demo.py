@@ -14,7 +14,7 @@ if __name__ == '__main__':
 	classifier_name = args.classifier_name[0]
 
 	#==========[ CREATE USER TRACKER, GESTURE CLASSIFIER	]==========
-	primesense = PrimeSense()
+	primesense = PrimeSense(debug=True)
 	while True:
 		primesense.update_no_game()
 		print primesense.players[0].gesture

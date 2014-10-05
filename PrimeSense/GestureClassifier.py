@@ -103,7 +103,7 @@ class GestureClassifier:
 			returns a prediction based on the pose 
 		"""
 		assert self.classifier_loaded
-		return self.classifier.predict(featurize(gesture_df))
+		return self.classifier.predict(self.featurize(gesture_df))
 
 
 	def save(self):

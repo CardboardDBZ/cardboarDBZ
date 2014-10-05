@@ -106,6 +106,12 @@ class Player:
 		if len(skeleton_c_coords) == 0:
 			return #no update
 
+		if type(self.c_coords) == type(None):
+			self.update_coords(skeleton_c_coords.pop(0))
+			self.update_gesture()
+			return
+
+
 		distances = [self.get_similarity(c_coords) for c_coords in skeleton_c_coords]
 		if not min(distances) < self.DISTANCE_THRESHOLD:
 			return #no update
@@ -120,7 +126,7 @@ class Player:
 		"""
 			sets self.gesture to the prediction of self.gesture_classifier 
 		"""
-		if self.h_coords:
+		if type(self.h_coords) != type(None):
 			self.gesture = self.gesture_classifier.predict(self.h_coords)
 
 

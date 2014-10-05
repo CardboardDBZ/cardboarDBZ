@@ -40,7 +40,8 @@ class PrimeSense():
 			p.skeleton_poses_h: list of dfs reprsenting poses in h_coords
 	"""
 
-	def __init__(self, video=None, record=False):
+	def __init__(self, video=None, debug=False):
+		self.debug = debug
 
 		#=====[ Step 1: setup receiving data	]=====
 		if video:
@@ -55,7 +56,8 @@ class PrimeSense():
 		self.communication_host = CommunicationHost()
 
 		#=====[ Step 3: try to inialize the game	]=====
-		if not record:
+		self.init_players()
+		if not self.debug:
 			self.init_game ()
 
 
@@ -135,14 +137,22 @@ class PrimeSense():
 	####################[ GAME AND PLAYERS ]########################################
 	################################################################################
 
+	def init_players(self):
+		"""
+			initializes players 
+		"""
+		self.gesture_classifier = GestureClassifier()
+		self.gesture_classifier.load_classifier()
+		self.players = [Player(0, self.gesture_classifier), Player(1, self.gesture_classifier)]
+		self.update_skeletons()
+
+
 	def init_game(self):
 		"""
 			Tries to initialize the two players; won't do so 
 			until there are at least two players present
 		"""
 		self.game_started = False
-		self.gesture_classifier = GestureClassifier()
-		self.players = [Player(0, self.gesture_classifier), Player(1, self.gesture_classifier)]
 		self.update_skeletons()
 
 		#=====[ Step 1: loop until we see two players	]=====
@@ -224,7 +234,7 @@ class PrimeSense():
 				raw_frames.append(self.frame_raw)
 			except KeyboardInterrupt:
 				break
-		print '===[ Finished Recording ]==='
+		print '===[ Finished self.debuging ]==='
 		print "ENTER SAVE NAME: (in ./data/)"
 		save_name = raw_input('--> ')
 		pickle.dump(raw_frames, open(os.path.join('./data', 'save_name'), 'w'))
@@ -233,7 +243,7 @@ class PrimeSense():
 
 	def record_gesture(self):
 
-		print '===[ Record Gesture ]==='
+		print '===[ self.debug Gesture ]==='
 		print "Enter gesture name"
 		gesture_name = raw_input('--->')
 		
@@ -243,11 +253,11 @@ class PrimeSense():
 		if not os.path.exists(gesture_dir):
 			os.mkdir(gesture_dir)
 
-		#=====[ Step 2: record each gesture	]=====
+		#=====[ Step 2: self.debug each gesture	]=====
 		player = None
 		while True:
 			try:
-				raw_input('>> press enter to record a gesture <<')
+				raw_input('>> press enter to self.debug a gesture <<')
 				self.update_skeletons()
 				if self.num_skeletons != 1:
 					print "==> ERROR: multiple people on premises"
