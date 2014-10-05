@@ -110,9 +110,6 @@ class DeviceReceiver (StoppableThread):
                 orientation = self.format_coords (data['ORIENTATION'])
                 formatted_frame[user][joint_name + "_POSITION"] = position
                 formatted_frame[user][joint_name + "_ORIENTATION"] = orientation
-                if None in position.keys():
-                    "========{{{ NONE OCCURS: }}}========"
-                    print formatted_frame[user]
 
         return formatted_frame
 
@@ -130,9 +127,7 @@ class DeviceReceiver (StoppableThread):
         raw_frame  = json.loads(self.socket.recv ()[len(device_filters[self.device_name]):])
 
         #==========[ Step 2: reformat ]==========
-        print 'formatted_frame'
         formatted_frame = self.format_frame_primesense (raw_frame)
-        print formatted_frame
 
         #==========[ Step 3: store/update ]==========
         self.last_frame = formatted_frame
