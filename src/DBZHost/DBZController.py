@@ -1,8 +1,8 @@
-####################
-# Class: PrimeSense
-# -----------------
-# wrapper class for dealing with the primesense
-####################
+######################
+# Class: DBZController
+# --------------------
+# wrapper class for dealing with all things cardboarDBZ.
+######################
 import os
 import pickle
 from copy import copy
@@ -24,10 +24,10 @@ def print_status(message):
 	print '---> %s' % message
 
 
-class PrimeSense():
+class DBZController():
 	"""
-		Class: PrimeSense
-		=================
+		Class: DBZController
+		====================
 		wrapper class for dealing with the primesense 
 
 		Ideal Operation:
