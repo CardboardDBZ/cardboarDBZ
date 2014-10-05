@@ -9,6 +9,13 @@ def get_random_pose(pose_dfs_list):
 	return random.choice(pose_dfs_list)
 
 
+def visualize_random_pose(visualizer, pose_dfs_list):
+	"""
+		visualizes a random pose 
+	"""
+	pose_df = get_random_pose(pose_dfs_list)
+	viz.visualize(pose_df)
+
 if __name__ == '__main__':
 
 	gesture_classifier = GestureClassifier(data_dir='../data/')

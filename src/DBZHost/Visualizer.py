@@ -48,75 +48,8 @@ class Visualizer:
 			-------------------
 			creates all static aspects of the plot
 		"""
-		#=====[ Create figure/axes	]=====
-		self.fig 			= plt.figure (figsize=plt.figaspect(1)*1.5)
-		self.ax 			= Axes3D (self.fig, rect=[0, 0.2, 1, 0.8], axisbg='#B0B0B0')
-		self.ax.set_xticks([])
-		self.ax.set_yticks([])
-		self.ax.set_zticks([])
+		pass
 
-
-		# self.ax_progress 	= plt.axes([0, 0, 1, 0.1], axisbg='#B0B0B0')
-		# self.ax_play	 	= plt.axes([0, 0.1, 0.5, 0.1])
-		# self.ax_mark	 	= plt.axes([0.5, 0.1, 0.5, 0.1])		
-		# self.ax.set_zticks ([])
-
-
-	# def get_pose_limits (self, pose_df):
-	# 	"""	
-	# 		returns centroid, x_lims, y_lims, z_lims
-	# 	"""
-	# 	centroid = pose_df.mean(axis=1)
-	# 	x_lims = pose_df.loc['x'].min(), pose_df.loc['x'].max()
-	# 	y_lims = pose_df.loc['y'].min(), pose_df.loc['y'].max()
-	# 	z_lims = pose_df.loc['z'].min(), pose_df.loc['z'].max()				
-	# 	return centroid, x_lims, y_lims, z_lims
-
-
-	# def shift (self, pose_df, origin):
-	# 	"""
-	# 		PRIVATE: shift
-	# 		--------------
-	# 		given a frame, shifts it to the provided origin
-	# 	""" 
-	# 	return {	
-				
-	# 				k:	{	
-	# 						'x':v['x'] - origin[0], 
-	# 						'y':v['y'] - self.y_floor,
-	# 						'z':v['z'] - origin[2]	
-	# 					} 
-					
-	# 					for k, v in joint_coords.items ()
-	# 			}
-
-
-	# def init_plot (self, pose_df):
-	# 	"""
-	# 		sets plot aspect ratio and bounds such that the body
-	# 		actually looks like a body; sets colors
-	# 	"""
-	# 	#==========[ Step 1: get centroid/limits for all dimensions ]==========
-	# 	# self.centroid, self.x_lims, self.y_lims, self.z_lims = self.get_pose_limits (pose_df)
-	# 	# self.z_floor = -640
-
-	# 	# #==========[ Step 2: set limits ]==========
-	# 	# self.ax.set_xlim (self.x_lims)
-	# 	# self.ax.set_ylim (self.y_lims)		
-	# 	# self.ax.set_zlim (0, self.z_lims[1] - self.z_lims[0])
-
-	# 	#==========[ Step 3: set aspect ratio	]==========
-	# 	# x_span = self.x_lims[1] - self.x_lims[0]
-	# 	# y_span = self.y_lims[1] - self.y_lims[0]
-	# 	# z_span = self.z_lims[1] - self.z_lims[0]
-
-	# 	# self.ax.set_aspect (x_span/z_span)
-
-
-
-	####################################################################################################
-	##############################[ --- DRAWING ON PLOT --- ]###########################################
-	####################################################################################################
 
 	def plot_line (self, p1, p2):
 		"""
@@ -135,11 +68,21 @@ class Visualizer:
 		"""
 			draws the pose on the figure 
 		"""
-		self.ax.set_aspect(1)
+		#=====[ Create figure/axes	]=====
+		self.fig 			= plt.figure (figsize=plt.figaspect(1)*1.5)
+		self.ax 			= Axes3D (self.fig, axisbg='#B0B0B0')
+		self.ax.set_xticks([])
+		self.ax.set_yticks([])
+		self.ax.set_zticks([])
+		# self.ax.set_aspect(1)
+
+		#=====[ Draw	]=====
 		for j1_name, j2_name in self.limb_joint_pairs:
 			self.plot_line(pose_df[j1_name], pose_df[j2_name])
 		plt.xlabel('X')
 		plt.ylabel('Y')
-		plt.show()
+
+
+
 
 
