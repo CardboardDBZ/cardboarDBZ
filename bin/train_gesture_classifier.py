@@ -14,7 +14,7 @@ if __name__ == '__main__':
 	classifier_name = args.classifier_name[0]
 
 	#=====[ TRAIN CLASSIFIER	]=====
-	classifier = GestureClassifier(data_dir='./data/', classifier_name='clf.pkl')
+	classifier = GestureClassifier(data_dir='../data/', classifier_name='clf.pkl')
 	classifier.train()
 	classifier.evaluate_self()
 	classifier.save()
