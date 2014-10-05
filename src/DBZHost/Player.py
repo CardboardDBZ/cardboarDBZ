@@ -131,16 +131,27 @@ class Player:
 			pass
 
 
+	def flip_x_z(self, c_coords):
+		"""
+			flips x and z coordinates, because apparently unity has 
+			them swapped
+		"""
+
+
 
 	def send_state(self, other_player):
 		"""
 			sends this Player's state from the primesense to the 
 			actual player via UnitySocket 
 		"""
+		self_coords = self.c_coords.copy()
+		self_coords.index = ['z', 'y', 'x']
+		other_coords = other_player.c_coords.copy()
+		other_coords.index = ['z', 'y', 'x']
 		message = {
-					'self_coords':self.c_coords.to_dict(),
+					'self_coords':self_coords.to_dict(),
 					'self_gesture':self.gesture,
-					'opponent_coords':other_player.c_coords.to_dict(),
+					'opponent_coords':other_coords.to_dict(),
 					'opponent_gesture':other_player.gesture
 		}
 		self.socket.send(message)
