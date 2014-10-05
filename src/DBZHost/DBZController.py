@@ -20,11 +20,7 @@ from Player import Player
 from GestureClassifier import GestureClassifier
 
 
-def print_status(message):
-	print '---> %s' % message
-
-
-class DBZController():
+class DBZController:
 	"""
 		Class: DBZController
 		====================
@@ -40,7 +36,8 @@ class DBZController():
 			p.skeleton_poses_h: list of dfs reprsenting poses in h_coords
 	"""
 
-	def __init__(self, data_dir='../data', video=None, debug=False):
+	def __init__(self, num_players=1, data_dir='../data', video=None, debug=False):
+
 		self.data_dir = data_dir
 		self.debug = debug
 
@@ -57,6 +54,7 @@ class DBZController():
 		self.communication_host = CommunicationHost()
 
 		#=====[ Step 3: try to inialize the game	]=====
+		self.num_players = num_players
 		self.init_players()
 		if not self.debug:
 			self.init_game ()
@@ -142,9 +140,10 @@ class DBZController():
 		"""
 			initializes players 
 		"""
+		assert self.num_players in [1, 2]
 		self.gesture_classifier = GestureClassifier(data_dir=self.data_dir)
 		self.gesture_classifier.load_classifier()
-		self.players = [Player(0, self.gesture_classifier), Player(1, self.gesture_classifier)]
+		self.players = [Player(ix, self.gesture_classifier) for ix in range(self.num_players)]
 		self.update_skeletons()
 
 
@@ -156,13 +155,12 @@ class DBZController():
 		self.game_started = False
 		self.update_skeletons()
 
-		#=====[ Step 1: loop until we see two players	]=====
-		while (self.num_skeletons < 2):
+		#=====[ Step 1: loop until we see all players	]=====
+		while (self.num_skeletons < self.num_players):
 			self.update_skeletons()
 
-		#=====[ Step 2: initialize the two players	]=====
-		self.players[0].update(self.skeleton_poses_c)
-		self.players[1].update(self.skeleton_poses_c)
+		#=====[ Step 2: initialize (update) all players	]=====
+		self.update_players()
 
 
 	def update_players(self):
@@ -180,7 +178,9 @@ class DBZController():
 			sends the states of players from Player objects to 
 			the actual phones 
 		"""
-		if self.players[0] and self.players[1]:
+		if self.num_players == 1:
+			self.players[0].send_state(None)
+		elif self.num_players == 2:
 			self.players[0].send_state(self.players[1])
 			self.players[1].send_state(self.players[0])			
 
@@ -191,8 +191,9 @@ class DBZController():
 		"""
 		self.update_skeletons()
 		self.update_players()
-		self.print_game_state()
 		self.send_player_states()
+		# self.print_game_state()
+
 
 
 	def update_no_game(self):

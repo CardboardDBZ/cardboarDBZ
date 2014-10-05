@@ -150,31 +150,38 @@ class Player:
 
 
 
+	def format_coordinates(self, coords):
+		"""
+			given coordinates as a pandas series, this will format them
+			for sending to the phone 
+		"""
+		coords = coords.copy()
+		coords = coords / float(self.SCALING_CONSTANT)
+		coords.index = ['z', 'y', 'x']
+		return coords.to_dict()
 
 
-	def send_state(self, other_player):
+
+	def send_state(self, other):
 		"""
 			sends this Player's state from the primesense to the 
 			actual player via UnitySocket 
 		"""
-		self_coords = self.c_coords.copy() / self.SCALING_CONSTANT
-		self_coords.index = ['z', 'y', 'x']
-		other_coords = other_player.c_coords.copy() / self.SCALING_CONSTANT
-		other_coords.index = ['z', 'y', 'x']
-		message = {
-					'self_coords':self_coords.to_dict(),
-					'self_gesture':self.gesture,
-					'opponent_coords':other_coords.to_dict(),
-					'opponent_gesture':other_player.gesture
-		}
-		if type(self.direction) != type(None):
-			self_direction = self.direction.copy() / self.SCALING_CONSTANT
-			self_direction.index = ['z', 'y','x']
-			message['self_gesture_direction'] = self_direction.to_dict()
-		if type(other_player.direction) != type(None):
-			other_direction = other_player.direction.copy() / self.SCALING_CONSTANT
-			other_direction.index = ['z', 'y','x']
-			message['other_gesture_direction'] = other_direction.to_dict()
+		message = {}
+
+		#=====[ Step 1: self	]=====
+		message['self_coords'] = self.format_coordinates(self.c_coords)
+		message['self_gesture'] = self.gesture
+		if not self.direction is None:
+			message['self_direction'] = self.format_coordinates(self.direction)
+
+		#=====[ Step 2: other	]=====
+		if not other is None:
+			message['other_coords'] = self.format_coordinates(other.c_coords)
+			message['other_gesture'] = other.gesture
+			if not other.direction is None:
+				message['other_direciton'] = self.format_coordinates(other.direction)
+
 		print message, '\n\n'
 		self.state_history.append(message)
 		self.socket.send(message)
