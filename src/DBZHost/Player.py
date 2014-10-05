@@ -127,7 +127,7 @@ class Player:
 			sets self.gesture to the prediction of self.gesture_classifier 
 		"""
 		if type(self.h_coords) != type(None):
-			self.gesture = self.gesture_classifier.predict(self.h_coords)
+			self.gesture = self.gesture_classifier.predict(self.h_coords)[0]
 			pass
 
 
@@ -140,7 +140,7 @@ class Player:
 		message = {
 					'self_coords':self.c_coords.to_dict(),
 					'self_gesture':self.gesture,
-					'opponent_coords':other_player.c_coords.to_dict()
+					'opponent_coords':other_player.c_coords.to_dict(),
 					'opponent_gesture':other_player.gesture
 		}
 		self.socket.send(message)
