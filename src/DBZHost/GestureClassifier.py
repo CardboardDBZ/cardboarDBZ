@@ -43,12 +43,15 @@ class GestureClassifier:
 
 	def load_gesture_data(self, gesture_name):
 		"""
-			given a gesture name, this will return a numpy matrix where rows 
-			are the gestures
+			returns c_dfs, h_dfs
+			each is a list of dataframes representing the body in body, human
+			coordinates
 		"""
 		gesture_dir = self.gesture_directories[gesture_name]
-		dfs = [pickle.load(open(os.path.join(gesture_dir, fn))) for fn in os.listdir(gesture_dir)]
-		return dfs
+		dicts = [pickle.load(open(os.path.join(gesture_dir, fn))) for fn in os.listdir(gesture_dir)]
+		c_dfs = [d['c_coords'] for d in dicts]
+		h_dfs = [d['h_coords'] for d in dicts]
+		return c_dfs, h_dfs
 
 
 	def get_X_y(self):
@@ -56,8 +59,9 @@ class GestureClassifier:
 			goes from self.data -> featurized X and y matrices for prediction 
 		"""
 		Xs, ys = [], []
-		for name, dfs_list in self.data.items():
-			data = np.matrix([self.featurize(df) for df in dfs_list])
+		for name, dfs_dict in self.data.items():
+			h_dfs = dfs_dict['h_coords']
+			data = np.matrix([self.featurize(df) for df in h_dfs])
 			Xs.append(data)
 			ys.append(np.array([name]*data.shape[0]))
 		self.X = np.concatenate(Xs)
@@ -76,7 +80,8 @@ class GestureClassifier:
 			self.gesture_directories = {name:os.path.join(self.gestures_dir, name) for name in os.listdir(self.gestures_dir)}
 			self.data = {}
 			for name in self.gesture_names:
-				self.data[name] = self.load_gesture_data(name)
+				c_dfs, h_dfs = self.load_gesture_data(name)
+				self.data[name] = {'c_coords':c_dfs, 'h_coords':h_dfs}
 			self.X, self.y = self.get_X_y ()
 			self.data_loaded = True
 
