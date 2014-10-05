@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import sklearn 
 from sklearn import cross_validation
-from sklearn.svm import SVC
+from sklearn.svm import SVC, NuSVC
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix
@@ -93,7 +93,10 @@ class GestureClassifier:
 			trains classifier based on all data available
 		"""
 		self.load_data()
-		self.classifier = KNeighborsClassifier(n_neighbors=5)
+		self.classifier = KNeighborsClassifier(n_neighbors=2)
+		# self.classifier = LogisticRegression()
+		# self.classifier = SVC(kernel='linear')
+		# self.classifier = NuSVC()
 		self.classifier.fit(self.X, self.y)
 		self.classifier_loaded = True
 
