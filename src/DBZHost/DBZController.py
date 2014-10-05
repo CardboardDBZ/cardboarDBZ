@@ -40,7 +40,8 @@ class DBZController():
 			p.skeleton_poses_h: list of dfs reprsenting poses in h_coords
 	"""
 
-	def __init__(self, video=None, debug=False):
+	def __init__(self, data_dir='../data', video=None, debug=False):
+		self.data_dir = data_dir
 		self.debug = debug
 
 		#=====[ Step 1: setup receiving data	]=====
@@ -141,7 +142,7 @@ class DBZController():
 		"""
 			initializes players 
 		"""
-		self.gesture_classifier = GestureClassifier()
+		self.gesture_classifier = GestureClassifier(data_dir=self.data_dir)
 		self.gesture_classifier.load_classifier()
 		self.players = [Player(0, self.gesture_classifier), Player(1, self.gesture_classifier)]
 		self.update_skeletons()
@@ -160,11 +161,8 @@ class DBZController():
 			self.update_skeletons()
 
 		#=====[ Step 2: initialize the two players	]=====
-		head_coords = [c_coords['head']['x'] for c_coords in self.skeleton_poses_c]
-		leftmost_player_ix = np.argmin(head_coords) #we THINK this gets the leftmost
-		rightmost_player_ix = np.argmax(head_coords)
-		self.players[0] = Player(0, self.skeleton_poses_c[leftmost_player_ix])
-		self.players[1] = Player(1, self.skeleton_poses_c[rightmost_player_ix])
+		self.players[0].update(self.skeleton_poses_c)
+		self.players[1].update(self.skeleton_poses_c)
 
 
 	def update_players(self):
