@@ -137,6 +137,16 @@ class Player:
 		if len(self.gesture_history) > 0:
 			self.gesture = mode(self.gesture_history[-15:])[0][0]
 
+		#=====[ Get direction	]=====
+		if self.gesture == 'right_blast':
+			self.direction = self.c_coords['right_hand'] - self.c_coords['right_elbow']
+		elif self.gesture == 'left_blast':
+			self.direction = self.c_coords['right_hand'] - self.c_coords['right_elbow']			
+		elif self.gesture == 'double_blast':
+			self.direction = (self.c_coords['right_hand'] + self.c_coords['left_hand'])/2 - self.c_coords['torso']
+		else:
+			self.direction = None
+
 
 
 
@@ -156,6 +166,14 @@ class Player:
 					'opponent_coords':other_coords.to_dict(),
 					'opponent_gesture':other_player.gesture
 		}
+		if type(self.direction) != type(None):
+			self_direction = self.direction.copy() / self.SCALING_CONSTANT
+			self_direction.index = ['z', 'y','x']
+			message['self_gesture_direction'] = self_direction.to_dict()
+		if type(other_player.direction) != type(None):
+			other_direction = other_player.direction.copy() / self.SCALING_CONSTANT
+			other_direction.index = ['z', 'y','x']
+			message['other_gesture_direction'] = other_direction.to_dict()
 		self.socket.send(message)
 
 

@@ -104,7 +104,7 @@ class DBZController():
 			self.video_frame += 1
 			raw_input('Video Mode [%s]: press enter to continue to next frame' % self.video_frame)
 			self.update_skeletons(input_frame=self.video[self.video_frame])
-			self.print_game_state()
+			# self.print_game_state()
 			return
 
 		#=====[ Step 2: figure out what the input frame is	]=====
@@ -191,7 +191,7 @@ class DBZController():
 		"""
 		self.update_skeletons()
 		self.update_players()
-		self.print_game_state()
+		# self.print_game_state()
 		self.send_player_states()
 
 
