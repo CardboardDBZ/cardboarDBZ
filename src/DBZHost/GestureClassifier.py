@@ -48,15 +48,16 @@ class GestureClassifier:
 		"""
 		gesture_dir = self.gesture_directories[gesture_name]
 		dfs = [pickle.load(open(os.path.join(gesture_dir, fn))) for fn in os.listdir(gesture_dir)]
-		return np.matrix([self.featurize(df) for df in dfs])
+		return dfs
 
 
 	def get_X_y(self):
 		"""
-			goes from self.data -> X and y matrices for prediction 
+			goes from self.data -> featurized X and y matrices for prediction 
 		"""
 		Xs, ys = [], []
-		for name, data in self.data.items():
+		for name, dfs_list in self.data.items():
+			data = np.matrix([self.featurize(df) for df in dfs_list])
 			Xs.append(data)
 			ys.append(np.array([name]*data.shape[0]))
 		self.X = np.concatenate(Xs)
@@ -102,9 +103,6 @@ class GestureClassifier:
 		"""
 		self.load_data()
 		self.classifier = KNeighborsClassifier(n_neighbors=2)
-		# self.classifier = LogisticRegression()
-		# self.classifier = SVC(kernel='linear')
-		# self.classifier = NuSVC()
 		self.classifier.fit(self.X, self.y)
 		self.classifier_loaded = True
 
@@ -144,11 +142,13 @@ class GestureClassifier:
 		clf_nb = MultinomialNB()
 
 		#=====[ Step 2: Cross Validation	]=====
-		print '===[ Without PCA ]==='
+		print '===[ RAW DATA ]==='
 		scores_log = cross_validation.cross_val_score(clf_log, X, y)
 		scores_knn = cross_validation.cross_val_score(clf_knn, X, y)
 		print 'LOG: ', scores_log
 		print 'KNN: ', scores_knn
+
+		
 
 
 		######[ DIMENSIONALITY REDUCTION: PCA	]#####
