@@ -181,8 +181,8 @@ class DBZController():
 			the actual phones 
 		"""
 		if self.players[0] and self.players[1]:
-			self.players[0].send_state(self.players[1].c_coords)
-			self.players[1].send_state(self.players[0].c_coords)			
+			self.players[0].send_state(self.players[1])
+			self.players[1].send_state(self.players[0])			
 
 
 	def update_game(self):

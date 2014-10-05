@@ -132,15 +132,16 @@ class Player:
 
 
 
-	def send_state(self, other_player_c_coords):
+	def send_state(self, other_player):
 		"""
 			sends this Player's state from the primesense to the 
 			actual player via UnitySocket 
 		"""
-		other_player_h_coords = self.c_coords_to_h_coords(other_player_c_coords)
 		message = {
-					'self_coords':self.h_coords.to_dict(),
-					'opponent_coords':other_player_h_coords.to_dict()
+					'self_coords':self.c_coords.to_dict(),
+					'self_gesture':self.gesture,
+					'opponent_coords':other_player.c_coords.to_dict()
+					'opponent_gesture':other_player.gesture
 		}
 		self.socket.send(message)
 
