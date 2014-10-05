@@ -1,6 +1,6 @@
 #!/Users/jayhack/anaconda/bin/python
 import argparse
-from GestureClassifier import GestureClassifier
+from DBZHost import GestureClassifier
 
 if __name__ == '__main__':
 
@@ -14,7 +14,7 @@ if __name__ == '__main__':
 	classifier_name = args.classifier_name[0]
 
 	#=====[ TRAIN CLASSIFIER	]=====
-	classifier = GestureClassifier(classifier_name=classifier_name)
+	classifier = GestureClassifier(data_dir='./data/', classifier_name='clf.pkl')
 	classifier.train()
 	classifier.evaluate_self()
 	classifier.save()

@@ -1,6 +1,6 @@
 #!/Users/jayhack/anaconda/bin/python
 import argparse
-from PrimeSense import PrimeSense
+from DBZHost import DBZController
 
 if __name__ == '__main__':
 
@@ -14,7 +14,7 @@ if __name__ == '__main__':
 	classifier_name = args.classifier_name[0]
 
 	#==========[ CREATE USER TRACKER, GESTURE CLASSIFIER	]==========
-	primesense = PrimeSense(debug=True)
+	dbz_host = DBZController(debug=True)
 	while True:
 		primesense.update_no_game()
 		print primesense.players[0].gesture
