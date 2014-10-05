@@ -51,6 +51,8 @@ class GestureClassifier:
 		for name, data in self.data.items():
 			Xs.append(data)
 			ys.append(np.array([name]*data.shape[0]))
+		print [x.shape for x in Xs]
+		print [y.shape for y in ys]
 		self.X = np.concatenate(Xs)
 		self.y = np.concatenate(ys)
 		return self.X, self.y
