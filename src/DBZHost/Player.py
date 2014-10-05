@@ -3,6 +3,7 @@
 # -------------
 # wrapper class for representing a single Player
 ####################
+from collections import Counter
 import numpy as np 
 import scipy as sp
 from scipy.stats import mode
@@ -136,28 +137,28 @@ class Player:
 			self.gesture_history.append(self.gesture_classifier.predict(self.h_coords)[0])
 
 		if len(self.gesture_history) > 0:
-			self.gesture = mode(self.gesture_history[-15:])[0][0]
+			self.gesture = Counter(self.gesture_history[-15:]).most_common(1)[0][0]
+		print self.gesture
 
 		#=====[ Get direction	]=====
-		if self.gesture == 'right_blast':
-			self.direction = self.c_coords['right_hand'] - self.c_coords['right_elbow']
-		elif self.gesture == 'left_blast':
-			self.direction = self.c_coords['right_hand'] - self.c_coords['right_elbow']			
-		elif self.gesture == 'double_blast':
-			self.direction = (self.c_coords['right_hand'] + self.c_coords['left_hand'])/2 - self.c_coords['torso']
+		if self.gesture == 'blast':
+			hands = [self.c_coords['right_hand'], self.c_coords['left_hand']]
+			top_hand = max(hands, key=lambda x:x['y'])
+			self.direction = top_hand - self.c_coords['neck']
 		else:
 			self.direction = None
 
 
-
-	def format_coordinates(self, coords):
+	def format_coordinates(self, coords, lower_foot):
 		"""
 			given coordinates as a pandas series, this will format them
 			for sending to the phone 
 		"""
 		coords = coords.copy()
 		coords = coords / float(self.SCALING_CONSTANT)
-		# coords.index = ['z', 'y', 'x']
+
+		#=====[ Get Z value for foot to zero	]=====
+		coords.loc['y'] = coords.loc['y'] - lower_foot['y']
 		return coords.to_dict()
 
 
@@ -169,18 +170,23 @@ class Player:
 		"""
 		message = {}
 
+		#=====[ Step 0: get lower foot	]=====
+		feet = [self.c_coords.left_foot, self.c_coords.right_foot]
+		lower_foot = min(feet, key=lambda f:f['y'])
+
+
 		#=====[ Step 1: self	]=====
-		message['self_coords'] = self.format_coordinates(self.c_coords)
+		message['self_coords'] = self.format_coordinates(self.c_coords, lower_foot)
 		message['self_gesture'] = self.gesture
 		if not self.direction is None:
-			message['self_direction'] = self.format_coordinates(self.direction)
+			message['self_direction'] = self.format_coordinates(self.direction, lower_foot)
 
 		#=====[ Step 2: other	]=====
 		if not opponent is None:
-			message['opponent_coords'] = self.format_coordinates(opponent.c_coords)
+			message['opponent_coords'] = self.format_coordinates(opponent.c_coords, lower_foot)
 			message['opponent_gesture'] = opponent.gesture
 			if not opponent.direction is None:
-				message['opponent_direciton'] = self.format_coordinates(opponent.direction)
+				message['opponent_direction'] = self.format_coordinates(opponent.direction, lower_foot)
 
 		print message, '\n\n'
 		self.state_history.append(message)
