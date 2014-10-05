@@ -22,7 +22,7 @@ class Player:
 		"""
 			intializes this player's coordinates
 		"""
-		self.socket = UnitySocket(index)
+		# self.socket = UnitySocket(index)
 		self.index = index
 		self.gesture_classifier = gesture_classifier
 		self.c_coords = None
@@ -127,7 +127,8 @@ class Player:
 			sets self.gesture to the prediction of self.gesture_classifier 
 		"""
 		if type(self.h_coords) != type(None):
-			self.gesture = self.gesture_classifier.predict(self.h_coords)
+			# self.gesture = self.gesture_classifier.predict(self.h_coords)
+			pass
 
 
 
@@ -141,7 +142,7 @@ class Player:
 					'self_coords':self.h_coords.to_dict(),
 					'opponent_coords':other_player_h_coords.to_dict()
 		}
-		self.socket.send(message)
+		# self.socket.send(message)
 
 
 	def __str__ (self):
