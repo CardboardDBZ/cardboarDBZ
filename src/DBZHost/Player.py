@@ -15,7 +15,8 @@ class Player:
 		- at startup, initializes itself with an origin
 		- has a moving origin that it tracks
 	"""
-	DISTANCE_THRESHOLD = 5000
+	DISTANCE_THRESHOLD = 500.
+	SCALING_CONSTANT = 400.
 
 
 	def __init__(self, index, gesture_classifier):
@@ -144,9 +145,9 @@ class Player:
 			sends this Player's state from the primesense to the 
 			actual player via UnitySocket 
 		"""
-		self_coords = self.c_coords.copy()
+		self_coords = self.c_coords.copy() / self.SCALING_CONSTANT
 		self_coords.index = ['z', 'y', 'x']
-		other_coords = other_player.c_coords.copy()
+		other_coords = other_player.c_coords.copy() / self.SCALING_CONSTANT
 		other_coords.index = ['z', 'y', 'x']
 		message = {
 					'self_coords':self_coords.to_dict(),
