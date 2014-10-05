@@ -53,9 +53,9 @@ class Player:
 		x_axis = np.array(c_coords['right_shoulder'] - self.origin)
 		z_axis = np.array(self.origin - c_coords['torso'])
 		y_axis = np.cross(z_axis, x_axis)
-		self.x_axis = x_axis / x_axis.sum()
-		self.y_axis = y_axis / y_axis.sum()
-		self.z_axis = z_axis / z_axis.sum()
+		self.x_axis = x_axis / np.linalg.norm(x_axis)
+		self.y_axis = y_axis / np.linalg.norm(y_axis)
+		self.z_axis = z_axis / np.linalg.norm(z_axis)
 
 
 	def c_coords_to_h_coords(self, c_coords):

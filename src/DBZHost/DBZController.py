@@ -266,8 +266,10 @@ class DBZController():
 				player.update(self.skeleton_poses_c)
 
 				h_coords = player.h_coords
+				c_coords = player.c_coords
+				coords = {'c_coords':c_coords, 'h_coords':h_coords}
 				filename = hashlib.md5(str(time.time())).hexdigest() + '.pose'
-				pickle.dump(h_coords, open(os.path.join(gesture_dir, filename), 'w'))
+				pickle.dump(coords, open(os.path.join(gesture_dir, filename), 'w'))
 				print "[[ SAVED: %s ]]" % os.path.join(gesture_dir, filename)
 			except KeyboardInterrupt:
 				break
