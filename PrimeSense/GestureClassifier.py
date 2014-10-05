@@ -12,25 +12,18 @@ import matplotlib.pyplot as plt
 
 class GestureClassifier:
 
-	def __init__(self, data_dir=os.path.join(os.getcwd(), 'data/gestures')):
+	def __init__(self, data_dir=os.path.join(os.getcwd(), 'data'), classifier_name='clf.pkl'):
 		self.data_dir = data_dir
-		self.load_data()
+		self.gestures_dir = os.path.join(self.data_dir, 'gestures')
+		self.classifiers_dir = os.path.join(self.data_dir, 'classifiers')
+		self.classifier_path = os.path.join(self.classifiers_dir, classifier_name)
+
+		self.data_loaded = False
+		self.classifier_loaded = False
 
 	################################################################################
 	####################[ LOADING/FORMATTING DATA ]#################################
 	################################################################################
-
-	def load_data(self):
-		"""
-			sets self.data to a dict mapping as follows:
-				self.data: gesture_name -> numpy matrix
-		"""
-		self.gesture_names = os.listdir(self.data_dir)
-		self.gesture_directories = {name:os.path.join(self.data_dir, name) for name in os.listdir(self.data_dir)}
-		self.data = {}
-		for name in self.gesture_names:
-			self.data[name] = self.load_gesture_data(name)
-
 
 	def featurize(self, gesture_df):
 		"""
@@ -63,12 +56,68 @@ class GestureClassifier:
 		return self.X, self.y
 
 
+	def load_data(self):
+		"""
+			sets self.data to a dict mapping as follows:
+				self.data: gesture_name -> numpy matrix
+			also sets self.X, self.y for training and whatnot
+		"""
+		if not self.data_loaded:
+			self.gesture_names = os.listdir(self.gestures_dir)
+			self.gesture_directories = {name:os.path.join(self.gestures_dir, name) for name in os.listdir(self.gestures_dir)}
+			self.data = {}
+			for name in self.gesture_names:
+				self.data[name] = self.load_gesture_data(name)
+			self.X, self.y = self.get_X_y ()
+			self.data_loaded = True
+
+
+	def load_classifier(self):
+		"""
+			loads self.classifier 
+		"""
+		if not self.classifier_loaded:
+			self.classifier = pickle.load(open(self.classifier_path, 'r'))
+			self.classifier_loaded = True
+
 
 
 
 
 	################################################################################
-	####################[ TRAINING/CROSSVALIDATION ]################################
+	####################[ TRAINING/PREDICTION ]#####################################
+	################################################################################
+
+	def train(self):
+		"""
+			trains classifier based on all data available
+		"""
+		self.load_data()
+		self.classifier = KNeighborsClassifier(n_neighbors=5)
+		self.classifier.fit(self.X, self.y)
+		self.classifier_loaded = True
+
+
+	def predict(self, gesture_df):
+		"""
+			returns a prediction based on the pose 
+		"""
+		assert self.classifier_loaded
+		return self.classifier.predict(featurize(gesture_df))
+
+
+	def save(self):
+		"""
+			saves the current classifier 
+		"""
+		pickle.dump(self.classifier, open(self.classifier_path, 'w'))
+
+
+
+
+
+	################################################################################
+	####################[ EVALUATION/CROSSVALIDATION ]##############################
 	################################################################################
 
 	def evaluate_models(self):
@@ -101,6 +150,14 @@ class GestureClassifier:
 		plt.show()
 
 
+	def evaluate_self(self):
+		"""
+			evaluates only the currently loaded classifier 
+		"""
+		assert self.classifier_loaded
+		scores = cross_validation.cross_val_score(self.classifier, self.X, self.y)
+		print "CROSS VALIDATION SCORES:"
+		print scores
 
 
 
