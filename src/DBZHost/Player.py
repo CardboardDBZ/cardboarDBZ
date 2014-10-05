@@ -4,6 +4,8 @@
 # wrapper class for representing a single Player
 ####################
 import numpy as np 
+import scipy as sp
+from scipy.stats import mode
 import pandas as pd
 from UnitySocket import UnitySocket
 from GestureClassifier import GestureClassifier
@@ -17,6 +19,7 @@ class Player:
 	"""
 	DISTANCE_THRESHOLD = 500.
 	SCALING_CONSTANT = 400.
+	GESTURE_LENGTH = 15
 
 
 	def __init__(self, index, gesture_classifier):
@@ -29,6 +32,7 @@ class Player:
 		self.c_coords = None
 		self.h_coords = None
 		self.gesture = 'no_gesture'
+		self.gesture_history = []
 
 
 	def get_origin(self, c_coords):
@@ -127,16 +131,13 @@ class Player:
 		"""
 			sets self.gesture to the prediction of self.gesture_classifier 
 		"""
-		if type(self.h_coords) != type(None):
-			self.gesture = self.gesture_classifier.predict(self.h_coords)[0]
-			pass
+		if type(self.h_coords) != type(None) :
+			self.gesture_history.append(self.gesture_classifier.predict(self.h_coords)[0])
+
+		if len(self.gesture_history) > 0:
+			self.gesture = mode(self.gesture_history[-15:])[0][0]
 
 
-	def flip_x_z(self, c_coords):
-		"""
-			flips x and z coordinates, because apparently unity has 
-			them swapped
-		"""
 
 
 

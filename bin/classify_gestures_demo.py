@@ -14,8 +14,8 @@ if __name__ == '__main__':
 	classifier_name = args.classifier_name[0]
 
 	#==========[ CREATE USER TRACKER, GESTURE CLASSIFIER	]==========
-	dbz_host = DBZController(debug=True)
+	dbz_controller = DBZController(debug=True)
 	while True:
-		primesense.update_no_game()
-		print primesense.players[0].gesture
+		dbz_controller.update_no_game()
+		print dbz_controller.players[0].gesture
 
