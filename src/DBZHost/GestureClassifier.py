@@ -8,6 +8,8 @@ from sklearn.svm import SVC, NuSVC
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix
+from sklearn.decomposition import PCA, SparsePCA, DictionaryLearning
+from sklearn.naive_bayes import MultinomialNB
 import matplotlib.pyplot as plt
 
 class GestureClassifier:
@@ -30,6 +32,12 @@ class GestureClassifier:
 			given a gesture represented as a dataframe, this will return a numpy 
 			array as a feature vector
 		"""
+		gesture_df = gesture_df.copy()
+
+		#=====[ Experiment: relative positions	]=====
+		gesture_df['hands_avg'] = (gesture_df['right_hand'] + gesture_df['left_hand'])/2.
+		gesture_df['elbows_avg'] = (gesture_df['right_elbow'] + gesture_df['left_elbow'])/2.
+
 		return np.array(gesture_df).flatten()
 
 
@@ -128,18 +136,38 @@ class GestureClassifier:
 			evaluates the model 
 		"""
 		#=====[ Step 1: Get X, y	]=====
-		X, y = self.get_X_y()
+		self.load_data()
+		X, y = self.X, self.y
 
-		#=====[ Step 2: Cross Validation	]=====
-		clf_svm = SVC(kernel='linear', C=1)
 		clf_log = LogisticRegression()
 		clf_knn = KNeighborsClassifier(n_neighbors=5)
-		scores_svm = cross_validation.cross_val_score(clf_svm, X, y)
+		clf_nb = MultinomialNB()
+
+		#=====[ Step 2: Cross Validation	]=====
+		print '===[ Without PCA ]==='
 		scores_log = cross_validation.cross_val_score(clf_log, X, y)
 		scores_knn = cross_validation.cross_val_score(clf_knn, X, y)
-		print 'SVM: ', scores_svm
 		print 'LOG: ', scores_log
 		print 'KNN: ', scores_knn
+
+
+		######[ DIMENSIONALITY REDUCTION: PCA	]#####
+		print '===[ With PCA ]==='
+		X_PCA = PCA(n_components=10).fit_transform(X)
+		scores_log = cross_validation.cross_val_score(clf_log, X_PCA, y)
+		scores_knn = cross_validation.cross_val_score(clf_knn, X_PCA, y)
+		print 'LOG: ', scores_log
+		print 'KNN: ', scores_knn
+
+		# print '===[ With Dictionary Learning ]==='
+		# X_DL = DictionaryLearning(n_components=10).fit_transform(X)
+		# scores_log = cross_validation.cross_val_score(clf_log, X_DL, y)
+		# scores_knn = cross_validation.cross_val_score(clf_knn, X_DL, y)
+		# scores_nb = cross_validation.cross_val_score(clf_nb, X_DL, y)
+		# print 'LOG: ', scores_log
+		# print 'KNN: ', scores_knn
+		# print 'NB: ', scores_nb
+
 
 		#=====[ Step 3: check out confusion matrix	]=====
 		X_train, X_test, y_train, y_test = cross_validation.train_test_split(X, y, test_size=0.4, random_state=0)
