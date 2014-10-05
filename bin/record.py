@@ -1,6 +1,7 @@
-from PrimeSense import PrimeSense 
+from DBZHost import DBZController
 
 if __name__ == '__main__':
 
-	p = PrimeSense(debug=True)
-	raw_frames = p.record()
+	dbz_controller = DBZController(debug=True)
+	raw_frames = dbz_controller.record()
+

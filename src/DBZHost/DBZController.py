@@ -230,12 +230,13 @@ class DBZController():
 			try:
 				self.update_skeletons()
 				raw_frames.append(self.frame_raw)
+				print '.'
 			except KeyboardInterrupt:
 				break
 		print '===[ Finished self.debuging ]==='
 		print "ENTER SAVE NAME: (in ./data/)"
 		save_name = raw_input('--> ')
-		pickle.dump(raw_frames, open(os.path.join('./data', 'save_name'), 'w'))
+		pickle.dump(raw_frames, open(os.path.join(self.data_dir, save_name), 'w'))
 		return raw_frames
 
 
