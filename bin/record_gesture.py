@@ -1,7 +1,7 @@
 import pickle
-from PrimeSense import PrimeSense
+from DBZHost import DBZController
 
 if __name__ == '__main__':
 
-	p = PrimeSense(debug=True)
-	p.record_gesture()
+	dbz_controller = DBZController(debug=True)
+	dbz_controller.record_gesture()

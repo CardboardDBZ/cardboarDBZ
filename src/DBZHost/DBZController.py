@@ -246,13 +246,13 @@ class DBZController():
 		gesture_name = raw_input('--->')
 		
 		#=====[ Step 1: make a gesture directory	]=====
-		gestures_dir = os.path.join(os.getcwd(), 'data/gestures')
+		gestures_dir = os.path.join(self.data_dir, 'gestures')
 		gesture_dir = os.path.join(gestures_dir, gesture_name)
 		if not os.path.exists(gesture_dir):
 			os.mkdir(gesture_dir)
 
 		#=====[ Step 2: self.debug each gesture	]=====
-		player = None
+		player = self.players[0]
 		while True:
 			try:
 				raw_input('>> press enter to self.debug a gesture <<')
@@ -260,11 +260,9 @@ class DBZController():
 				if self.num_skeletons != 1:
 					print "==> ERROR: multiple people on premises"
 					continue 
-				if not player:
-					player = Player(0, self.skeleton_poses_c[0])
-				else:
-					print self.skeleton_poses_c[0]
-					player.update(self.skeleton_poses_c)
+				
+				print self.skeleton_poses_c[0]
+				player.update(self.skeleton_poses_c)
 
 				h_coords = player.h_coords
 				filename = hashlib.md5(str(time.time())).hexdigest() + '.pose'
