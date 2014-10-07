@@ -81,7 +81,10 @@ class DeviceReceiver (StoppableThread):
             -------------------------
             grabs a frame via self.read_frame
         """
-        self.read_frame ()
+        try:
+            self.read_frame ()
+        except:
+            print "*** Note: dropped frame ***"
 
 
 
