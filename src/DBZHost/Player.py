@@ -144,7 +144,7 @@ class Player:
 		if self.gesture == 'blast':
 			hands = [self.c_coords['right_hand'], self.c_coords['left_hand']]
 			top_hand = max(hands, key=lambda x:x['y'])
-			self.direction = top_hand - self.c_coords['neck']
+			self.direction = self.c_coords['right_hand'] - self.c_coords['neck']
 		else:
 			self.direction = None
 
@@ -158,7 +158,7 @@ class Player:
 		coords = coords / float(self.SCALING_CONSTANT)
 
 		#=====[ Get Z value for foot to zero	]=====
-		coords.loc['y'] = coords.loc['y'] - lower_foot['y']
+		coords.loc['y'] = coords.loc['y'] - lower_foot.loc['y']
 		return coords.to_dict()
 
 
@@ -171,24 +171,33 @@ class Player:
 		message = {}
 
 		#=====[ Step 0: get lower foot	]=====
-		feet = [self.c_coords.left_foot, self.c_coords.right_foot]
-		lower_foot = min(feet, key=lambda f:f['y'])
+		self_feet = [self.c_coords.left_foot / float(self.SCALING_CONSTANT), self.c_coords.right_foot / float(self.SCALING_CONSTANT)]
+		# op_feet = [opponent.c_coords.left_foot / float(self.SCALING_CONSTANT), opponent.c_coords.right_foot / float(self.SCALING_CONSTANT)]
+		self_lower_foot = min(self_feet, key=lambda f:f['y'])
+		# op_lower_foot = min(op_feet, key=lambda f:f['y'])		
+		# print op_lower_foot.loc['y']
 
 
 		#=====[ Step 1: self	]=====
-		message['self_coords'] = self.format_coordinates(self.c_coords, lower_foot)
+		message['self_coords'] = self.format_coordinates(self.c_coords, self_lower_foot)
 		message['self_gesture'] = self.gesture
 		if not self.direction is None:
-			message['self_direction'] = self.format_coordinates(self.direction, lower_foot)
+			message['self_direction'] = self.format_coordinates(self.direction, self_lower_foot)
 
 		#=====[ Step 2: other	]=====
-		if not opponent is None:
-			message['opponent_coords'] = self.format_coordinates(opponent.c_coords, lower_foot)
-			message['opponent_gesture'] = opponent.gesture
-			if not opponent.direction is None:
-				message['opponent_direction'] = self.format_coordinates(opponent.direction, lower_foot)
+		message['opponent_coords'] = self.format_coordinates(self.c_coords, self_lower_foot)
+		message['opponent_gesture'] = 'no_gesture'
+		# if not opponent.direction is None:
+			# message['opponent_direction'] = self.format_coordinates(opponent.direction, op_lower_foot)
 
-		print message, '\n\n'
+
+		# if not opponent is None:
+		# 	message['opponent_coords'] = self.format_coordinates(opponent.c_coords, op_lower_foot)
+		# 	message['opponent_gesture'] = opponent.gesture
+		# 	if not opponent.direction is None:
+		# 		message['opponent_direction'] = self.format_coordinates(opponent.direction, op_lower_foot)
+
+		# print message, '\n\n'
 		self.state_history.append(message)
 		self.socket.send(message)
 
