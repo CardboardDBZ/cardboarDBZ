@@ -1,3 +1,6 @@
 *.~
 *.pyc
 Gooku.unitypackage
+OpenNI2
+NiTE2
+primesense_receiver/Bin/*
