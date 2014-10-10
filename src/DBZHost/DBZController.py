@@ -91,7 +91,7 @@ class DBZController:
 		return pd.DataFrame(d)
 
 
-	def update_skeletons(self, input_frame=None):
+	def update_skeletons(self, input_frame=None, realtime=False):
 		"""
 			updates the following variables:
 				- frame_raw: raw json 
@@ -103,9 +103,10 @@ class DBZController:
 		#=====[ Step 1: deal with video mode	]=====
 		if not input_frame and self.video_mode:
 			self.video_frame += 1
-			key = raw_input('Video Mode [%s]: press enter to continue to next frame, q to quit' % self.video_frame)
-			if key == 'q':
-				quit()
+			if not realtime:
+				key = raw_input('Video Mode [%s]: press enter to continue to next frame, q to quit' % self.video_frame)
+				if key == 'q':
+					quit()
 			self.update_skeletons(input_frame=self.video[self.video_frame])
 			# self.print_game_state()
 			return
@@ -190,11 +191,11 @@ class DBZController:
 			self.players[1].send_state(self.players[0])			
 
 
-	def update_game(self):
+	def update_game(self, realtime=False):
 		"""
 			updates all player locations in the game;
 		"""
-		self.update_skeletons()
+		self.update_skeletons(realtime=realtime)
 		self.update_players()
 		self.send_player_states()
 		# self.print_game_state()
