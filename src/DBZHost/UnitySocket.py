@@ -2,7 +2,7 @@ import socket
 import json
 
 COMPUTER_PORT = 5557
-PHONE_PORT = 5558
+# PHONE_PORT = 5558
 
 class UnitySocket:
 
