@@ -9,4 +9,14 @@ _/ ___\\__  \\_  __ \/ __ |  | __ \ /  _ \__  \\_  __ \    |  \|    |  _/ /     
 
 Setup:
 ------
-- use anaconda. This has numpy, scipy, everything else you need.
+~$: cd /path/to/project/directory
+~$: ./configure.sh
+
+[ In window #1: ]
+~$: cd primesense_receiver
+~$: ./run.sh
+
+[ In window #2: ]
+~$: cd bin
+~$: ./one_player_live.py
+
