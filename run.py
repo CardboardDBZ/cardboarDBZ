@@ -10,7 +10,7 @@ if __name__ == '__main__':
 
 	#=====[ Step 2: spawn primesense receiver	]=====
 	os.chdir('primesense_receiver')
-	os.system('source ./run.sh')
+	os.system('source ./run.sh &')
 	os.chdir('..')
 
 	#=====[ Step 3: spawn python package	]=====
