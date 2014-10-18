@@ -8,8 +8,11 @@ import numpy as np
 import scipy as sp
 from scipy.stats import mode
 import pandas as pd
-from UnitySocket import UnitySocket
+from UnitySocket import UnitySocketGroup
 from GestureClassifier import GestureClassifier
+
+COMPUTER_PORT = 5557
+PHONE_PORT = 5558
 
 class Player:
 	"""
@@ -27,7 +30,7 @@ class Player:
 		"""
 			intializes this player's coordinates
 		"""
-		self.socket = UnitySocket(index)
+		self.socket = UnitySocketGroup([COMPUTER_PORT, PHONE_PORT])
 		self.index = index
 		self.gesture_classifier = gesture_classifier
 		self.c_coords = None

@@ -1,35 +1,35 @@
 import socket
 import json
 
-COMPUTER_PORT = 5557
-# PHONE_PORT = 5558
+
+class UnitySocketGroup:
+
+    def __init__(self, ports=[]):
+        self.ports = ports
+        self.sockets = [UnitySocket(port) for port in ports]
+
+    def send(self, msg):
+        return [socket.send(msg) for socket in self.sockets]
+
+    def close(self):
+        return [socket.close() for socket in self.sockets]
+
 
 class UnitySocket:
 
-    def __init__(self, player=0):
-        self.player = player
+    def __init__(self, port=5557):
+        self.port = port
 
-        #=====[ Step 1: get port numbers ]=====
-        self.port_computer = COMPUTER_PORT
-        # self.port_phone = PHONE_PORT + player
+        #=====[ Step 1: make sockets ]=====
+        self.s = socket.socket()
 
-        #=====[ Step 2: make sockets ]=====
-        self.s_computer = socket.socket()
-        # self.s_phone = socket.socket()
+        #=====[ Step 2: connect ]=====
+        self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.s.setblocking(0)
+        self.s.bind(('', self.port))
 
-        #=====[ Step 3: connect ]=====
-        self.s_computer.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.s_computer.setblocking(0)
-        self.s_computer.bind(('', self.port_computer))
-
-        # self.s_phone.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        # self.s_phone.setblocking(0)
-        # self.s_phone.bind(('', self.port_phone))
-
-        self.s_computer.listen(5)
-        self.c_computer = None
-        # self.s_phone.listen(5)
-        # self.c_phone = None
+        self.s.listen(5)
+        self.c = None
 
 
     def send(self, msg):
@@ -37,14 +37,12 @@ class UnitySocket:
             sends the message to both phone and computer
         """
         try:
-            self.c_computer, addr_computer = self.s_computer.accept()
-            # self.c_phone, addr_phone = self.s_phone.accept()            
+            self.c, addr = self.s.accept()
         except socket.error:
-            if  self.c_computer is None:
-                print('Player #' + str(self.player) + ' is not connected.')
+            if  self.c is None:
+                print('#####[ No connection on port ' + str(self.port) + ' detected. ]#####')
                 return False
-        self.c_computer.sendall(json.dumps(msg))
-        # self.c_phone.sendall(json.dumps(msg))
+        self.c.sendall(json.dumps(msg))
         return True
 
 
@@ -52,10 +50,7 @@ class UnitySocket:
         """
             closes all sockets 
         """
-        self.c_computer.close()
-        self.s_computer.close()
-
-        # self.c_phone.close()
-        # self.s_phone.close()        
+        self.c.close()
+        self.s.close()     
 
 
